@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="sidebar p-2">
+        <h4>
+            <center>
+                <div class="text-white">SVM Adaboost</div>
+            </center>
+        </h4>
+        <hr>
+        <a href="#dashboard">Dashboard</a>
+        <button type="button" class="btn btn-outline-light btn-block" data-bs-toggle="modal" data-bs-target="#dataLatihModal" style="width: 100%;">
+            Tambah Data
+        </button>
+        <br>
+        <br>
+        <button type="button" class="btn btn-outline-light btn-block" data-bs-toggle="modal" data-bs-target="#trainingModal" style="width: 100%;">
+            Training & Evaluate Model
+        </button>
+        
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light p-2">
+        <a class="navbar-brand" href="#">Admin Dashboard</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+    </nav>
+    <div class="content">
+        
+        <div class="container-fluid">
+            <div class="row my-4">
+                <div class="col-md-6">
+                    <div class="card  mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Jumlah Data Latih</h5>
+                            <h4 id="data_latih_counter">110</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card  mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Jumlah Data Uji</h5>
+                            <h4 id="data_uji_counter">110</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            Data Uji
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Nama</th>
+                                            <th scope="col">Alasan Layak PIP</th>
+                                            <th scope="col">Jumlah Bantuan</th>
+                                            <th scope="col">Jumlah Tanggungan</th>
+                                            <th scope="col">Layak PIP</th>
+                                            <th scope="col">Penghasilan</th>
+                                            <th scope="col">Status Bantuan</th>
+                                            <th scope="col">Status Ekonomi</th>
+                                            <th scope="col">Tahun Penerimaan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="data_uji">
+                                        <!-- Data will be populated here by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="card">
+                        <div class="card-header">
+                            Data Latih
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table class="table" style="font-size: 12px;">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Nama</th>
+                                            <th scope="col">Alasan Layak PIP</th>
+                                            <th scope="col">Jumlah Bantuan</th>
+                                            <th scope="col">Jumlah Tanggungan</th>
+                                            <th scope="col">Layak PIP</th>
+                                            <th scope="col">Penghasilan</th>
+                                            <th scope="col">Status Bantuan</th>
+                                            <th scope="col">Status Ekonomi</th>
+                                            <th scope="col">Status Kesesuaian</th>
+                                            <th scope="col">Tahun Penerimaan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="data_latih">
+                                        <!-- Data will be populated here by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="card">
+                        <div class="card-header">
+                            Hasil Klasifikasi
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table class="table" style="font-size: 12px;">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Nama</th>
+                                            <th scope="col">Status Bantuan</th>
+                                            <th scope="col">Status Kesesuaian Adaboost</th>
+                                            <th scope="col">Status Kesesuaian SVM</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="data_respons">
+                                        <!-- Data will be populated here by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            Hasil Prediksi
+                        </div>
+                        <div class="card-body">
+                            <div id="kesesuaian_chart"></div>
+                            <br>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Keterangan</th>
+                                        <th scope="col">Jumlah</th>
+                                        <th scope="col">Persentase (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="hasil_counter">
+                                    <!-- Data will be populated here by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="dataLatihModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Input Data Latih</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label for="nama" class="form-label">Nama</label>
+                                    <input type="text" class="form-control" id="nama" name="nama" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="penghasilan" class="form-label">Penghasilan</label>
+                                    <select class="form-control" id="penghasilan" name="penghasilan" required>
+                                        <option value="">Pilih Penghasilan</option>
+                                        <option value="Rp. 500,000 - Rp. 999,999">Rp. 500,000 - Rp. 999,999</option>
+                                        <option value="Rp. 1,000,000 - Rp. 1,999,999">Rp. 1,000,000 - Rp. 1,999,999</option>
+                                        <option value="Rp. 2,000,000 - Rp. 4,999,999">Rp. 2,000,000 - Rp. 4,999,999</option>
+                                        <!-- Tambahkan pilihan sesuai kebutuhan -->
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="status_ekonomi" class="form-label">Status Ekonomi</label>
+                                    <select class="form-control" id="status_ekonomi" name="status_ekonomi" required>
+                                        <option value="">Pilih Status Ekonomi</option>
+                                        <option value="MISKIN">MISKIN</option>
+                                        <option value="SANGAT MISKIN">SANGAT MISKIN</option>
+                                        <option value="MENENGAH KEBAWAH">MENENGAH KEBAWAH</option>
+                                        <!-- Tambahkan pilihan sesuai kebutuhan -->
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="jumlah_tanggungan" class="form-label">Jumlah Tanggungan</label>
+                                    <input type="number" class="form-control" id="jumlah_tanggungan" name="jumlah_tanggungan" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="layak_pip" class="form-label">Layak PIP</label>
+                                    <select class="form-control" id="layak_pip" name="layak_pip" required>
+                                        <option value="">Pilih Layak PIP</option>
+                                        <option value="Ya">Ya</option>
+                                        <option value="Tidak">Tidak</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label for="alasan_layak_pip" class="form-label">Alasan Layak PIP</label>
+                                    <input type="text" class="form-control" id="alasan_layak_pip" name="alasan_layak_pip">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="tahun_penerimaan" class="form-label">Tahun Penerimaan</label>
+                                    <input type="number" class="form-control" id="tahun_penerimaan" name="tahun_penerimaan" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="jumlah_bantuan" class="form-label">Jumlah Bantuan</label>
+                                    <input type="number" class="form-control" id="jumlah_bantuan" name="jumlah_bantuan" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="status_bantuan" class="form-label">Status Bantuan</label>
+                                    <select class="form-control" id="status_bantuan" name="status_bantuan" required>
+                                        <option value="">Pilih Status Bantuan</option>
+                                        <option value="Diterima">Diterima</option>
+                                        <option value="Diproses">Diproses</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="status_kesesuaian" class="form-label">Status Kesesuaian</label>
+                                    <select class="form-control" id="status_kesesuaian" name="status_kesesuaian" required>
+                                        <option value="">Pilih Status Kesesuaian</option>
+                                        <option value="Sesuai">Sesuai</option>
+                                        <option value="Tidak Sesuai">Tidak Sesuai</option>
+                                        <option value="Tidak Tepat Sasaran">Tidak Tepat Sasaran</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="trainingModal" tabindex="-1" aria-labelledby="trainingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 700px;">
+            <div class="modal-content" >
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="trainingModalLabel">Train Model</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <button id="trainButton" class="btn btn-success">Train Model</button>
+                    <hr>
+                    <button id="evaluateButton" class="btn btn-info">Evaluate Model</button>
+                    <hr>
+                    <div class="form-group">
+                        <label for="evaluationResult">Evaluation Result</label>
+                        <textarea id="evaluationResult" class="form-control" rows="5" readonly></textarea>
+                    </div>
+                </div>
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
