@@ -245,7 +245,40 @@ async function evaluateModel() {
         document.getElementById('evaluationResult').value = "Failed to evaluate model.";
     }
 }
+async function saveDataUji() {
+    const formData = {
+        nama: document.getElementById('nama').value,
+        penghasilan: document.getElementById('penghasilan').value,
+        status_ekonomi: document.getElementById('status_ekonomi').value,
+        jumlah_tanggungan: document.getElementById('jumlah_tanggungan').value,
+        layak_pip: document.getElementById('layak_pip').value,
+        alasan_layak_pip: document.getElementById('alasan_layak_pip').value,
+        tahun_penerimaan: document.getElementById('tahun_penerimaan').value,
+        jumlah_bantuan: document.getElementById('jumlah_bantuan').value,
+        status_bantuan: document.getElementById('status_bantuan').value
+    };
 
+    try {
+        const response = await fetch('http://127.0.0.1:5000/save_data_uji', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+            alert('Data berhasil disimpan');
+            document.getElementById('dataUjiForm').reset(); // Reset form setelah sukses menyimpan data
+        } else {
+            const errorData = await response.json();
+            alert('Gagal menyimpan data: ' + errorData.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat menyimpan data');
+    }
+}
 document.getElementById('trainButton').addEventListener('click', trainModel);
 document.getElementById('evaluateButton').addEventListener('click', evaluateModel);
 data_latih()

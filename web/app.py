@@ -241,6 +241,53 @@ def save_data_latih():
         error_msg = str(e)
         return jsonify({"error": "Gagal menyimpan data", "message": error_msg}), 400
 
+@app.route('/save_data_uji', methods=['POST'])
+def save_data_uji():
+    try:
+        # Ambil data dari JSON payload
+        data = request.json
+        nama = data.get('nama')
+        penghasilan = data.get('penghasilan')
+        status_ekonomi = data.get('status_ekonomi')
+        jumlah_tanggungan = data.get('jumlah_tanggungan')
+        layak_pip = data.get('layak_pip')
+        alasan_layak_pip = data.get('alasan_layak_pip')
+        tahun_penerimaan = data.get('tahun_penerimaan')
+        jumlah_bantuan = data.get('jumlah_bantuan')
+        status_bantuan = data.get('status_bantuan')
+
+        # Buat koneksi ke database menggunakan mysql-connector
+        connection = mysql.connector.connect(
+            host='localhost',
+            database='fahri',
+            user='root',
+            password=''
+        )
+
+        if connection.is_connected():
+            cursor = connection.cursor()
+            query = """
+            INSERT INTO data_uji (
+                nama, penghasilan, status_ekonomi, jumlah_tanggungan,
+                layak_pip, alasan_layak_pip, tahun_penerimaan,
+                jumlah_bantuan, status_bantuan
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            params = (
+                nama, penghasilan, status_ekonomi, jumlah_tanggungan,
+                layak_pip, alasan_layak_pip, tahun_penerimaan,
+                jumlah_bantuan, status_bantuan
+            )
+            cursor.execute(query, params)
+            connection.commit()
+            cursor.close()
+            connection.close()
+
+        return jsonify({"message": "Data berhasil disimpan"}), 201
+
+    except Error as e:
+        error_msg = str(e)
+        return jsonify({"error": "Gagal menyimpan data", "message": error_msg}), 400
 
 @app.route('/data_latih', methods=['GET'])
 def get_data_latih():
