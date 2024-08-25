@@ -170,6 +170,7 @@ def predict_route():
         for index, row in data_uji.iterrows():
             result = {
                 "nama": row['nama'],
+                "status_bantuan": row['status_bantuan'],
                 "svm_predicted_kesesuaian": svm_predictions[index],
                 "adaboost_predicted_kesesuaian": adaboost_predictions[index]
             }

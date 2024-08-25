@@ -105,6 +105,7 @@ async function hasil_prediksi() {
             const row = `
                 <tr>
                     <td>${item.nama ? item.nama : 'N/A'}</td>
+                    <td>${item.status_bantuan ? item.status_bantuan : 'N/A'}</td>
                     <td>${item.adaboost_predicted_kesesuaian ? item.adaboost_predicted_kesesuaian : 'N/A'}</td>
                     <td>${item.svm_predicted_kesesuaian ? item.svm_predicted_kesesuaian : 'N/A'}</td>
                 </tr>
