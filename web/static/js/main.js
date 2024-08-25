@@ -76,42 +76,52 @@ document.addEventListener('DOMContentLoaded', hasil_prediksi);
 
 async function hasil_prediksi() {
     try {
+        // Fetch data from the API
         const response = await fetch('http://127.0.0.1:5000/predict'); // Ganti dengan link API yang sesuai
-        const data = await response.json();
-        
-        // Sort data by name in ascending order
-        data.sort((a, b) => a.nama.localeCompare(b.nama));
-        
-        const tableBody = document.getElementById('data_respons');
-        tableBody.innerHTML = ''; // Clear existing data
+        const data = await response.json(); // Parse response as JSON
 
+        // Ensure the data is properly parsed
+        let parsedData = data;
+
+        // If the data is a string (not JSON), parse it into a JSON object
+        if (typeof parsedData === 'string') {
+            parsedData = JSON.parse(parsedData);
+        }
+
+        // Sort data by 'nama' field in ascending order
+        parsedData.predictions.sort((a, b) => a.nama.localeCompare(b.nama));
+
+        // Get table body for rendering rows
+        const tableBody = document.getElementById('data_respons');
+        tableBody.innerHTML = ''; // Clear existing table data
+
+        // Categories for counting and displaying results
         const categories = ["Sesuai", "Tidak Sesuai", "Tidak Tepat Sasaran"];
         const adaboostCounts = { "Sesuai": 0, "Tidak Sesuai": 0, "Tidak Tepat Sasaran": 0 };
         const svmCounts = { "Sesuai": 0, "Tidak Sesuai": 0, "Tidak Tepat Sasaran": 0 };
 
-        data.forEach(item => {
+        // Loop through each item in the predictions and populate the table
+        parsedData.predictions.forEach(item => {
             const row = `
                 <tr>
-                    <td>${item.nama}</td>
-                    <td>${item.status_bantuan}</td>
-                    <td>${item.status_kesesuaian_adaboost}</td>
-                    <td>${item.status_kesesuaian_svm}</td>
+                    <td>${item.nama ? item.nama : 'N/A'}</td>
+                    <td>${item.adaboost_predicted_kesesuaian ? item.adaboost_predicted_kesesuaian : 'N/A'}</td>
+                    <td>${item.svm_predicted_kesesuaian ? item.svm_predicted_kesesuaian : 'N/A'}</td>
                 </tr>
             `;
             tableBody.innerHTML += row;
 
-            if (item.status_kesesuaian_adaboost in adaboostCounts) {
-                adaboostCounts[item.status_kesesuaian_adaboost]++;
+            // Count the occurrences for Adaboost and SVM predictions
+            if (categories.includes(item.adaboost_predicted_kesesuaian)) {
+                adaboostCounts[item.adaboost_predicted_kesesuaian]++;
             }
 
-            if (item.status_kesesuaian_svm in svmCounts) {
-                svmCounts[item.status_kesesuaian_svm]++;
+            if (categories.includes(item.svm_predicted_kesesuaian)) {
+                svmCounts[item.svm_predicted_kesesuaian]++;
             }
         });
 
-        // Display the count of data items
-
-        // Prepare data for Plotly
+        // Plotly chart data preparation
         const trace1 = {
             x: categories,
             y: categories.map(cat => adaboostCounts[cat]),
@@ -130,8 +140,8 @@ async function hasil_prediksi() {
             textposition: 'auto'
         };
 
+        // Plot the chart using Plotly
         const dataPlotly = [trace1, trace2];
-
         const layout = {
             barmode: 'group',
             title: 'Jumlah Status Kesesuaian Adaboost dan SVM',
@@ -147,16 +157,17 @@ async function hasil_prediksi() {
 
         const totalAdaboost = adaboostCounts["Sesuai"] + adaboostCounts["Tidak Sesuai"] + adaboostCounts["Tidak Tepat Sasaran"];
         const totalSvm = svmCounts["Sesuai"] + svmCounts["Tidak Sesuai"] + svmCounts["Tidak Tepat Sasaran"];
-        
+
         const rows = [
-            { keterangan: 'Sesuai (SVM Adaboost)', jumlah: adaboostCounts["Sesuai"], persentase: (adaboostCounts["Sesuai"] / totalAdaboost * 100).toFixed(2) },
-            { keterangan: 'Tidak Sesuai (SVM Adaboost)', jumlah: adaboostCounts["Tidak Sesuai"], persentase: (adaboostCounts["Tidak Sesuai"] / totalAdaboost * 100).toFixed(2) },
-            { keterangan: 'Tidak Tepat Sasaran (SVM Adaboost)', jumlah: adaboostCounts["Tidak Tepat Sasaran"], persentase: (adaboostCounts["Tidak Tepat Sasaran"] / totalAdaboost * 100).toFixed(2) },
-            { keterangan: 'Sesuai (SVM)', jumlah: svmCounts["Sesuai"], persentase: (svmCounts["Sesuai"] / totalSvm * 100).toFixed(2) },
-            { keterangan: 'Tidak Sesuai (SVM)', jumlah: svmCounts["Tidak Sesuai"], persentase: (svmCounts["Tidak Sesuai"] / totalSvm * 100).toFixed(2) },
-            { keterangan: 'Tidak Tepat Sasaran (SVM)', jumlah: svmCounts["Tidak Tepat Sasaran"], persentase: (svmCounts["Tidak Tepat Sasaran"] / totalSvm * 100).toFixed(2) }
+            { keterangan: 'Sesuai (SVM Adaboost)', jumlah: adaboostCounts["Sesuai"], persentase: ((adaboostCounts["Sesuai"] / totalAdaboost) * 100 || 0).toFixed(2) },
+            { keterangan: 'Tidak Sesuai (SVM Adaboost)', jumlah: adaboostCounts["Tidak Sesuai"], persentase: ((adaboostCounts["Tidak Sesuai"] / totalAdaboost) * 100 || 0).toFixed(2) },
+            { keterangan: 'Tidak Tepat Sasaran (SVM Adaboost)', jumlah: adaboostCounts["Tidak Tepat Sasaran"], persentase: ((adaboostCounts["Tidak Tepat Sasaran"] / totalAdaboost) * 100 || 0).toFixed(2) },
+            { keterangan: 'Sesuai (SVM)', jumlah: svmCounts["Sesuai"], persentase: ((svmCounts["Sesuai"] / totalSvm) * 100 || 0).toFixed(2) },
+            { keterangan: 'Tidak Sesuai (SVM)', jumlah: svmCounts["Tidak Sesuai"], persentase: ((svmCounts["Tidak Sesuai"] / totalSvm) * 100 || 0).toFixed(2) },
+            { keterangan: 'Tidak Tepat Sasaran (SVM)', jumlah: svmCounts["Tidak Tepat Sasaran"], persentase: ((svmCounts["Tidak Tepat Sasaran"] / totalSvm) * 100 || 0).toFixed(2) }
         ];
 
+        // Render rows for the counter table
         rows.forEach(row => {
             const rowElement = `
                 <tr>
@@ -169,9 +180,11 @@ async function hasil_prediksi() {
         });
 
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching or parsing data:', error);
+        alert('Terjadi kesalahan saat mengambil data prediksi. Mohon coba lagi.');
     }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('dataLatihForm').addEventListener('submit', function(event) {
         event.preventDefault();

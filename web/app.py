@@ -11,6 +11,7 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 import mysql.connector
 from mysql.connector import Error
+import numpy as np
 
 
 app = Flask(__name__)
@@ -37,11 +38,27 @@ def preprocess_data(data_latih, data_uji):
     le_dict = {}
     columns_to_encode = ['penghasilan', 'status_ekonomi', 'layak_pip', 'status_bantuan']
 
+    # Replace missing or empty values with a placeholder like 'unknown'
+    data_latih = data_latih.replace('', 'unknown')
+    data_uji = data_uji.replace('', 'unknown')
+    
     for column in columns_to_encode:
         print(f"Encoding column: {column}")
         le = LabelEncoder()
+        
+        # Fit LabelEncoder on data_latih
         data_latih[column] = le.fit_transform(data_latih[column].astype(str))
+        
+        # Handle unseen labels by adding 'unknown' to the classes if necessary
+        le_classes = list(le.classes_)
+        if 'unknown' not in le_classes:
+            le_classes.append('unknown')
+            le.classes_ = np.array(le_classes)
+        
+        # Transform data_uji with the updated classes
+        data_uji[column] = data_uji[column].apply(lambda x: 'unknown' if x not in le.classes_ else x)
         data_uji[column] = le.transform(data_uji[column].astype(str))
+        
         le_dict[column] = le
 
     # Encode the target variable for training
@@ -58,15 +75,21 @@ def preprocess_data(data_latih, data_uji):
     print("Data preprocessing completed")
     return X_latih, y_latih, X_uji, le_dict
 
+
+
 @app.route('/train', methods=['GET'])
 def train_route():
+    ensure_model_directory()  # Ensure directory exists before saving models
     print("Starting training process")
     data_latih, data_uji = load_data_from_db()
-    X_latih, y_latih, _, le_dict = preprocess_data(data_latih, data_uji)
+
+    # Preprocess data
+    X_latih, y_latih, X_uji, le_dict = preprocess_data(data_latih, data_uji)
 
     print("Scaling training data")
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_latih)
+    X_test_scaled = scaler.transform(X_uji)  # Scale the test data using the same scaler
     print("Scaling completed")
 
     # Perform hyperparameter tuning for SVM
@@ -108,36 +131,59 @@ def train_route():
         "svm_best_params": svm_grid_search.best_params_,
         "adaboost_best_params": adaboost_grid_search.best_params_
     })
-
 @app.route('/predict', methods=['GET'])
 def predict_route():
-    if not all(os.path.exists(os.path.join(MODEL_DIR, f)) for f in ['svm_model.pkl', 'adaboost_svm_model.pkl', 'le_dict.pkl']):
-        return jsonify({"error": "Models not trained. Please call /train first."}), 400
+    try:
+        ensure_model_directory()  # Ensure the directory exists
 
-    scaler = joblib.load(os.path.join(MODEL_DIR, 'scaler.pkl'))
-    svm_model = joblib.load(os.path.join(MODEL_DIR, 'svm_model.pkl'))
-    adaboost_model = joblib.load(os.path.join(MODEL_DIR, 'adaboost_svm_model.pkl'))
-    le_dict = joblib.load(os.path.join(MODEL_DIR, 'le_dict.pkl'))
+        # Load the saved models and preprocessing objects
+        scaler = joblib.load(os.path.join(MODEL_DIR, 'scaler.pkl'))
+        svm_model = joblib.load(os.path.join(MODEL_DIR, 'svm_model.pkl'))
+        adaboost_model = joblib.load(os.path.join(MODEL_DIR, 'adaboost_svm_model.pkl'))
+        le_dict = joblib.load(os.path.join(MODEL_DIR, 'le_dict.pkl'))
 
-    data_latih, data_uji = load_data_from_db()
-    _, _, X_uji, _ = preprocess_data(data_latih, data_uji)
+        # Load the data from the database
+        data_latih, data_uji = load_data_from_db()
 
-    X_uji_scaled = scaler.transform(X_uji)
+        if data_uji.empty:
+            return jsonify({"error": "Data uji kosong"}), 400
 
-    svm_predictions = svm_model.predict(X_uji_scaled)
-    adaboost_predictions = adaboost_model.predict(X_uji_scaled)
+        # Preprocess the data (only preprocess the test data)
+        _, _, X_uji, _ = preprocess_data(data_latih, data_uji)
 
-    # Inverse transform the predictions
-    svm_predictions = le_dict['status_kesesuaian'].inverse_transform(svm_predictions)
-    adaboost_predictions = le_dict['status_kesesuaian'].inverse_transform(adaboost_predictions)
+        if X_uji.empty:
+            return jsonify({"error": "Data uji tidak dapat diproses"}), 400
 
-    # Prepare results
-    results = data_uji[['nama']].copy()
-    results['status_bantuan'] = le_dict['status_bantuan'].inverse_transform(data_uji['status_bantuan'])
-    results['status_kesesuaian_svm'] = svm_predictions
-    results['status_kesesuaian_adaboost'] = adaboost_predictions
+        # Scale the test data
+        X_uji_scaled = scaler.transform(X_uji)
 
-    return jsonify(results.to_dict(orient='records'))
+        # Predict using the trained models
+        svm_predictions = svm_model.predict(X_uji_scaled)
+        adaboost_predictions = adaboost_model.predict(X_uji_scaled)
+
+        # Inverse transform the predictions back to original labels
+        svm_predictions = le_dict['status_kesesuaian'].inverse_transform(svm_predictions)
+        adaboost_predictions = le_dict['status_kesesuaian'].inverse_transform(adaboost_predictions)
+
+        # Prepare the results in a structured format
+        results = []
+        for index, row in data_uji.iterrows():
+            result = {
+                "nama": row['nama'],
+                "svm_predicted_kesesuaian": svm_predictions[index],
+                "adaboost_predicted_kesesuaian": adaboost_predictions[index]
+            }
+            results.append(result)
+
+        # Ensure the response is always JSON
+        return jsonify({"predictions": results}), 200
+
+    except Exception as e:
+        # If any error occurs, return the error as a JSON object
+        return jsonify({"error": str(e)}), 500
+
+
+
 
 @app.route('/evaluate', methods=['GET'])
 def evaluate_route():
