@@ -51,7 +51,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="card  mb-3">
+                    <div class="card mb-3">
                         <div class="card-body">
                             <h5 class="card-title">Jumlah Data Uji</h5>
                             <h4 id="data_uji_counter">110</h4>
@@ -180,7 +180,7 @@
                 </div>
                 <!-- Modal Body -->
                 <div class="modal-body">
-                    <form>
+                    <form id="dataLatihForm">
                         <div class="row">
                             <div class="col-6">
                                 <div class="mb-3">
@@ -257,7 +257,7 @@
                 <!-- Modal Footer -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary" onclick="saveDataLatih()">Submit</button>
                 </div>
             </div>
         </div>
@@ -303,11 +303,11 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label for="nama" class="form-label">Nama</label>
-                                    <input type="text" class="form-control" id="nama" name="nama" required>
+                                    <input type="text" class="form-control" id="data_uji_nama" name="data_uji_nama" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="penghasilan" class="form-label">Penghasilan</label>
-                                    <select class="form-control" id="penghasilan" name="penghasilan" required>
+                                    <select class="form-control" id="data_uji_penghasilan" name="data_uji_penghasilan" required>
                                         <option value="">Pilih Penghasilan</option>
                                         <option value="Rp. 500,000 - Rp. 999,999">Rp. 500,000 - Rp. 999,999</option>
                                         <option value="Rp. 1,000,000 - Rp. 1,999,999">Rp. 1,000,000 - Rp. 1,999,999</option>
@@ -316,7 +316,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="status_ekonomi" class="form-label">Status Ekonomi</label>
-                                    <select class="form-control" id="status_ekonomi" name="status_ekonomi" required>
+                                    <select class="form-control" id="data_uji_status_ekonomi" name="data_uji_status_ekonomi" required>
                                         <option value="">Pilih Status Ekonomi</option>
                                         <option value="MISKIN">MISKIN</option>
                                         <option value="SANGAT MISKIN">SANGAT MISKIN</option>
@@ -325,11 +325,11 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="jumlah_tanggungan" class="form-label">Jumlah Tanggungan</label>
-                                    <input type="number" class="form-control" id="jumlah_tanggungan" name="jumlah_tanggungan" required>
+                                    <input type="number" class="form-control" id="data_uji_jumlah_tanggungan" name="data_uji_jumlah_tanggungan" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="layak_pip" class="form-label">Layak PIP</label>
-                                    <select class="form-control" id="layak_pip" name="layak_pip" required>
+                                    <select class="form-control" id="data_uji_layak_pip" name="data_uji_layak_pip" required>
                                         <option value="">Pilih Layak PIP</option>
                                         <option value="Ya">Ya</option>
                                         <option value="Tidak">Tidak</option>
@@ -339,19 +339,19 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label for="alasan_layak_pip" class="form-label">Alasan Layak PIP</label>
-                                    <input type="text" class="form-control" id="alasan_layak_pip" name="alasan_layak_pip" required>
+                                    <input type="text" class="form-control" id="data_uji_alasan_layak_pip" name="data_uji_alasan_layak_pip" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="tahun_penerimaan" class="form-label">Tahun Penerimaan</label>
-                                    <input type="number" class="form-control" id="tahun_penerimaan" name="tahun_penerimaan" required>
+                                    <input type="number" class="form-control" id="data_uji_tahun_penerimaan" name="data_uji_tahun_penerimaan" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="jumlah_bantuan" class="form-label">Jumlah Bantuan</label>
-                                    <input type="number" class="form-control" id="jumlah_bantuan" name="jumlah_bantuan" required>
+                                    <input type="number" class="form-control" id="data_uji_jumlah_bantuan" name="data_uji_jumlah_bantuan" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="status_bantuan" class="form-label">Status Bantuan</label>
-                                    <select class="form-control" id="status_bantuan" name="status_bantuan" required>
+                                    <select class="form-control" id="data_uji_status_bantuan" name="data_uji_status_bantuan" required>
                                         <option value="">Pilih Status Bantuan</option>
                                         <option value="Diterima">Diterima</option>
                                         <option value="Diproses">Diproses</option>
@@ -364,7 +364,7 @@
                 <!-- Modal Footer -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="saveDataUji()">Save</button>
+                    <button type="button"  class="btn btn-primary" onclick="saveDataUji()">Save</button>
                 </div>
             </div>
         </div>

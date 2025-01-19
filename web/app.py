@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 # Global variables
 MODEL_DIR = 'static/models/'
-
+ 
 def ensure_model_directory():
     os.makedirs(MODEL_DIR, exist_ok=True)
 
@@ -29,8 +29,8 @@ def get_database_connection():
 def load_data_from_db():
     print("Loading data from database")
     connection = get_database_connection()
-    data_latih = pd.read_sql('SELECT * FROM data_latih', con=connection)
-    data_uji = pd.read_sql('SELECT * FROM data_uji', con=connection)
+    data_latih = pd.read_sql('SELECT * FROM data_latih ORDER BY id DESC', con=connection)
+    data_uji = pd.read_sql('SELECT * FROM data_uji ORDER BY id DESC', con=connection)
     return data_latih, data_uji
 
 def preprocess_data(data_latih, data_uji):
@@ -263,7 +263,7 @@ def save_data_latih():
             password=''
         )
 
-        if connection.is_connected():
+        if connection.is_connected(): 
             cursor = connection.cursor()
             query = """
             INSERT INTO data_latih (

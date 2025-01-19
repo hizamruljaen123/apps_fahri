@@ -261,15 +261,15 @@ async function evaluateModel() {
 }
 async function saveDataUji() {
     const formData = {
-        nama: document.getElementById('nama').value,
-        penghasilan: document.getElementById('penghasilan').value,
-        status_ekonomi: document.getElementById('status_ekonomi').value,
-        jumlah_tanggungan: document.getElementById('jumlah_tanggungan').value,
-        layak_pip: document.getElementById('layak_pip').value,
-        alasan_layak_pip: document.getElementById('alasan_layak_pip').value,
-        tahun_penerimaan: document.getElementById('tahun_penerimaan').value,
-        jumlah_bantuan: document.getElementById('jumlah_bantuan').value,
-        status_bantuan: document.getElementById('status_bantuan').value
+        nama: document.getElementById('data_uji_nama').value,
+        penghasilan: document.getElementById('data_uji_penghasilan').value,
+        status_ekonomi: document.getElementById('data_uji_status_ekonomi').value,
+        jumlah_tanggungan: document.getElementById('data_uji_jumlah_tanggungan').value,
+        layak_pip: document.getElementById('data_uji_layak_pip').value,
+        alasan_layak_pip: document.getElementById('data_uji_alasan_layak_pip').value,
+        tahun_penerimaan: document.getElementById('data_uji_tahun_penerimaan').value,
+        jumlah_bantuan: document.getElementById('data_uji_jumlah_bantuan').value,
+        status_bantuan: document.getElementById('data_uji_status_bantuan').value
     };
 
     try {
